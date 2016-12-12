@@ -53,13 +53,13 @@ int time_id = -1;
 
 #define APPLE_MESH "C:/Users/Aisling/Documents/Visual Studio 2012/Projects/Project1/Project1/models/apple.obj"
 #define BANANA_MESH "C:/Users/Aisling/Documents/Visual Studio 2012/Projects/Project1/Project1/models/banana.obj"
-#define ORANGE_MESH "C:/Users/Aisling/Documents/Visual Studio 2012/Projects/Project1/Project1/models/Orange.obj"
+#define PEAR_MESH "C:/Users/Aisling/Documents/Visual Studio 2012/Projects/Project1/Project1/models/pear.obj"
 
 
 /*----------------------------------------------------------------------------
   ----------------------------------------------------------------------------*/
 
-int NUM_MESHES = 10;
+int NUM_MESHES = 13;
 
 std::vector<float>* g_vp = new std::vector<float>[NUM_MESHES];
 std::vector<float>* g_vn = new std::vector<float>[NUM_MESHES];
@@ -68,7 +68,7 @@ std::vector<float>* g_vt = new std::vector<float>[NUM_MESHES];
 
 int* g_point_count = new int[NUM_MESHES];
 
-GLuint VAOs[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+GLuint VAOs[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
 
 // Macro for indexing vertex buffer
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -76,8 +76,10 @@ GLuint VAOs[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 using namespace std;
 GLuint shaderProgramID;
 
-float xxxx = 0.0f;
+float xxxx = 10.0f;
 float zzzz= 0.0f;
+
+int score = 0;
 
 unsigned int mesh_vao = 0;
 int width = 1200;
@@ -95,7 +97,8 @@ bool start = true;
 float sweet_locations[30][2];
 bool sweet_uneaten[30];
 
-float bushes_locations[30][2];
+float fruit_locations[30][2];
+bool fruit_uneaten[30];
 
 vec3 plane_location = vec3 (0.0f, 0.0f, 0.0f);
 vec3 tongue_location = vec3(8.0f, -1.0f, -270.0f);
@@ -317,14 +320,40 @@ void generateObjectBufferMesh(char* file_path, int model_number) {
 
 void collision_detection(){
 	
-	for(int i = 0; i < 24; i ++){
+	for(int i = 0; i < 28; i ++){
 		if(sweet_uneaten[i] == true){
-			if(xxxx >= (sweet_locations[i][0] - 5) && xxxx <= (sweet_locations[i][0] + 5)
-				&& zzzz >= (sweet_locations[i][1] - 5) && zzzz <= (sweet_locations[i][1] + 5)){
+			if(xxxx >= (sweet_locations[i][0] - 5) && xxxx <= (sweet_locations[i][0] + 5) && zzzz >= (sweet_locations[i][1] - 7) && zzzz <= (sweet_locations[i][1] + 5)){
 					sweet_uneaten[i] = false;
+					
+					//lolipops worth 5, jelly tots worth 10, sweets worth 15
+					if(i >= 0 && i < 15){
+						score += 5;
+					}else if (i >= 15 && i < 24){
+						score += 10;
+					}else if(i >=24 && i < 27){
+						score += 15;
+					}
 			}
 		}
 	}
+		for(int i = 0; i < 28; i ++){
+			if(fruit_uneaten[i] == true){
+				if(xxxx >= (fruit_locations[i][0] - 3) && xxxx <= (fruit_locations[i][0] + 3) && zzzz >= (fruit_locations[i][1] - 5) && zzzz <= (fruit_locations[i][1] + 3)){
+						fruit_uneaten[i] = false;
+					
+						//apples worth 5, bananas worth 10, pears worth 15
+						if(i >= 0 && i < 15){
+							score -= 5;
+						}else if (i >= 15 && i < 24){
+							score -= 10;
+						}else if(i >=24 && i < 27){
+							score -= 15;
+						}
+	
+				}
+		}
+	}
+
 }
 
 float random_poisition(){
@@ -343,7 +372,7 @@ void draw_player(int matrix_location, int view_mat_location, int proj_mat_locati
 
 	//bushes
 	mat4 model_player = identity_mat4 ();	
-	model_player = translate (model_player, vec3(xxxx, 5, zzzz));
+	model_player = translate (model_player, vec3(xxxx, 0, zzzz));
 	mat4 play = model_player * plane;
 
 	glUniformMatrix4fv (matrix_location, 1, GL_FALSE, play.m);
@@ -359,14 +388,12 @@ void draw_lolipops(int index, int matrix_location, int view_mat_location, int pr
 	//lolipop
 	mat4 model_lolipop = identity_mat4 ();	
 	model_lolipop = translate (model_lolipop, vec3(sweet_locations[index][0], 0, sweet_locations[index][1])); 
-	//model_lolipop = scale(model_lolipop, vec3(0.5,0.5,0.5));
 	mat4 loli = model_lolipop * plane;
 
 	glUniformMatrix4fv (matrix_location, 1, GL_FALSE, loli.m);
 
 	glBindVertexArray(VAOs[5]);
 	glDrawArrays (GL_TRIANGLES, 0, g_point_count[5]);
-
 
 }
 
@@ -376,14 +403,12 @@ void draw_sweets(int index, int matrix_location, int view_mat_location, int proj
 	mat4 model_sweets = identity_mat4 ();	
 	model_sweets = rotate_y_deg(model_sweets, 10 * index);
 	model_sweets = translate (model_sweets, vec3(sweet_locations[index][0], 0, sweet_locations[index][1])); 
-	//model_sweets = scale(model_sweets, vec3(0.5,0.5,0.5));
 	mat4 swe = model_sweets * plane;
 
 	glUniformMatrix4fv (matrix_location, 1, GL_FALSE, swe.m);
 
 	glBindVertexArray(VAOs[6]);
 	glDrawArrays (GL_TRIANGLES, 0, g_point_count[6]);
-
 
 }
 
@@ -392,14 +417,53 @@ void draw_jellies(int index, int matrix_location, int view_mat_location, int pro
 	//jelies
 	mat4 model_jellies = identity_mat4 ();	
 	model_jellies = translate (model_jellies, vec3(sweet_locations[index][0], 0, sweet_locations[index][1])); 
-	//model_sweets = scale(model_sweets, vec3(0.5,0.5,0.5));
 	mat4 jell = model_jellies * plane;
-
 	glUniformMatrix4fv (matrix_location, 1, GL_FALSE, jell.m);
 
 	glBindVertexArray(VAOs[7]);
 	glDrawArrays (GL_TRIANGLES, 0, g_point_count[7]);
 
+}
+
+void draw_apples(int index, int matrix_location, int view_mat_location, int proj_mat_location, mat4 plane) {
+
+	//apples
+	mat4 model_apples = identity_mat4 ();	
+	model_apples = translate (model_apples, vec3(fruit_locations[index][0], 0, fruit_locations[index][1])); 
+	mat4 app = model_apples * plane;
+
+	glUniformMatrix4fv (matrix_location, 1, GL_FALSE, app.m);
+
+	glBindVertexArray(VAOs[8]);
+	glDrawArrays (GL_TRIANGLES, 0, g_point_count[8]);
+
+}
+
+void draw_bananas(int index, int matrix_location, int view_mat_location, int proj_mat_location, mat4 plane) {
+
+	//bananas
+	mat4 model_bananas = identity_mat4 ();	
+	model_bananas = translate (model_bananas, vec3(fruit_locations[index][0], 0, fruit_locations[index][1])); 
+	mat4 ban = model_bananas * plane;
+
+	glUniformMatrix4fv (matrix_location, 1, GL_FALSE, ban.m);
+
+	glBindVertexArray(VAOs[9]);
+	glDrawArrays (GL_TRIANGLES, 0, g_point_count[9]);
+
+}
+
+void draw_pears(int index, int matrix_location, int view_mat_location, int proj_mat_location, mat4 plane) {
+
+	//pears
+	mat4 model_pears = identity_mat4 ();	
+	model_pears = translate (model_pears, vec3(fruit_locations[index][0], 0, fruit_locations[index][1])); 
+	mat4 pea = model_pears * plane;
+
+	glUniformMatrix4fv (matrix_location, 1, GL_FALSE, pea.m);
+
+	glBindVertexArray(VAOs[10]);
+	glDrawArrays (GL_TRIANGLES, 0, g_point_count[10]);
 
 }
 
@@ -451,7 +515,6 @@ void display(){
 	float g = fabs(sinf(t + 1.57f));
 	change_text_colour(time_id, r, g, 0.0f, 1.0f);
 
-
 	//draw_texts ();
 
 	//Declare your uniform variables that will be used in your shader
@@ -460,7 +523,7 @@ void display(){
 	int proj_mat_location = glGetUniformLocation (shaderProgramID, "proj");
 
 
-	mat4 cam = look_at(vec3(camerax, cameray, cameraz), vec3 (10,0,0), vec3(0,1,0));
+	mat4 cam = look_at(vec3(camerax, cameray, cameraz), vec3 (xxxx,0,zzzz), vec3(0,1,0));
 
 	//cout << camerax << "," << cameray << "," << cameraz << endl;
 
@@ -516,7 +579,10 @@ void display(){
 		runner++;
 
 		if(cameray < 196.0f){
-			cameray+= 0.2;
+			cameray += 0.2;
+		}
+		if(cameraz < -175.0f){
+			cameraz += 0.2;
 		}
 		glDrawArrays (GL_TRIANGLES, 0, g_point_count[3]);
 		
@@ -524,28 +590,51 @@ void display(){
 
 		collision_detection();
 
+		cout << score << endl;
+
 		glDrawArrays (GL_TRIANGLES, 0, g_point_count[3]);
 
 		draw_player(matrix_location, view_mat_location, proj_mat_location, model_plane);
 
 		//lolis
-		for(int i = 0; i < 8; i++){
+		for(int i = 0; i < 15; i++){
 			if(sweet_uneaten[i] == true){
 				draw_lolipops(i, matrix_location, view_mat_location, proj_mat_location, model_plane);
 			}
 		}
 
 		//sweets
-		for(int j = 8; j < 16; j++){ 
+		for(int j = 15; j < 23; j++){ 
 			if(sweet_uneaten[j] == true){
 				draw_sweets(j, matrix_location, view_mat_location, proj_mat_location, model_plane);
 			}
 		}
 
 		//jellies
-		for(int k = 16; k < 24; k++){
+		for(int k = 23; k < 28; k++){
 			if(sweet_uneaten[k] == true){
 				draw_jellies(k, matrix_location, view_mat_location, proj_mat_location, model_plane);
+			}
+		}
+
+		//apples
+		for(int i = 0; i < 15; i++){
+			if(fruit_uneaten[i] == true){
+				draw_apples(i, matrix_location, view_mat_location, proj_mat_location, model_plane);
+			}
+		}
+
+		//bananas
+		for(int j = 15; j < 23; j++){ 
+			if(fruit_uneaten[j] == true){
+				draw_bananas(j, matrix_location, view_mat_location, proj_mat_location, model_plane);
+			}
+		}
+
+		//pears
+		for(int k = 23; k < 28; k++){
+			if(fruit_uneaten[k] == true){
+				draw_pears(k, matrix_location, view_mat_location, proj_mat_location, model_plane);
 			}
 		}
 	}
@@ -587,6 +676,10 @@ void init()
 	generateObjectBufferMesh(LOLIPOP_MESH, 5);
 	generateObjectBufferMesh(SWEET_MESH, 6);
 	generateObjectBufferMesh(JELLY_MESH, 7);
+
+	generateObjectBufferMesh(APPLE_MESH, 8);
+	generateObjectBufferMesh(BANANA_MESH, 9);
+	generateObjectBufferMesh(PEAR_MESH, 10);
 
 }
 
@@ -657,15 +750,16 @@ int main(int argc, char** argv){
 	if(first_go){
 		first_go = false;
 		 
-		for(int index = 0; index < 30; index++){
+		for(int index = 0; index < 28; index++){
 
 			sweet_locations[index][0] = random_poisition();
 			sweet_locations[index][1] = random_poisition();
 
-			bushes_locations[index][0] = random_poisition();
-			bushes_locations[index][1] = random_poisition();
+			fruit_locations[index][0] = random_poisition();
+			fruit_locations[index][1] = random_poisition();
 
 			sweet_uneaten[index] = true;
+			fruit_uneaten[index] = true;
 		}
 	}
 
