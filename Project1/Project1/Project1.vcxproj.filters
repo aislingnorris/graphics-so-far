@@ -36,4 +36,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\Shaders\simpleVertexShader.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="..\Shaders\simpleFragmentShader.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

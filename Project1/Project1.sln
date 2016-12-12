@@ -3,6 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Project1", "Project1\Project1.vcxproj", "{EBF8508E-40A5-4C01-A9B8-77AFFBCF169D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{75A79E5E-CE02-495E-A160-E16560AA2A20}"
+	ProjectSection(SolutionItems) = preProject
+		Shaders\simpleFragmentShader.txt = Shaders\simpleFragmentShader.txt
+		Shaders\simpleVertexShader.txt = Shaders\simpleVertexShader.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32

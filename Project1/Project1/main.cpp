@@ -82,14 +82,19 @@ float zzzz= 0.0f;
 int score = 0;
 
 unsigned int mesh_vao = 0;
-int width = 1200;
-int height = 1000;
+int width = 1400;
+int height = 900;
 
 float beginning_cam_z;
 
 float camerax = 10;
-float cameray = 196;
+float cameray = 166;
 float cameraz = -288.0f;
+
+float a = 0, b = 161, c = -28;
+
+vec3 colourL = vec3 (1.0, 0.0, 0.0);
+vec3 lightL = vec3 (0.0, 10.0, -288.0);
 
 bool first_go = true;
 bool start = true;
@@ -102,6 +107,17 @@ bool fruit_uneaten[30];
 
 vec3 plane_location = vec3 (0.0f, 0.0f, 0.0f);
 vec3 tongue_location = vec3(8.0f, -1.0f, -270.0f);
+
+
+vec3 b_c = vec3(1.0, 1.0, 0.0);
+vec3 pe_c = vec3(0.2, 1.0, 0.2);
+vec3 j_c = vec3(0.5, 0.0, 0.8);
+vec3 t_c = vec3(1.0, 0.5, 0.5);
+vec3 pl_c = vec3(0.1, 0.4, 0.1);
+vec3 a_c = vec3(0.8, 0.2, 0.1);
+vec3 l_c = vec3(0.8, 0.3, 1.0);
+vec3 s_c = vec3(0.0, 0.2, 0.8);
+vec3 p_c = vec3(1.0, 1.0, 1.0);
 
 
 //max_bounds LBC(-70,0-70) RBC (70,0-70) LFC (-70,0,70) RFC (70,0,70)
@@ -336,20 +352,18 @@ void collision_detection(){
 			}
 		}
 	}
-		for(int i = 0; i < 28; i ++){
+		for(int i = 0; i < 23; i ++){
 			if(fruit_uneaten[i] == true){
 				if(xxxx >= (fruit_locations[i][0] - 3) && xxxx <= (fruit_locations[i][0] + 3) && zzzz >= (fruit_locations[i][1] - 5) && zzzz <= (fruit_locations[i][1] + 3)){
 						fruit_uneaten[i] = false;
-					
-						//apples worth 5, bananas worth 10, pears worth 15
-						if(i >= 0 && i < 15){
-							score -= 5;
-						}else if (i >= 15 && i < 24){
-							score -= 10;
-						}else if(i >=24 && i < 27){
-							score -= 15;
+						if(score > 0){
+							//apples worth 5, pears worth 10
+							if(i >= 0 && i < 12){
+								score -= 5;
+							}else if (i >= 12 && i < 23){
+								score -= 10;
+							}
 						}
-	
 				}
 		}
 	}
@@ -372,7 +386,7 @@ void draw_player(int matrix_location, int view_mat_location, int proj_mat_locati
 
 	//bushes
 	mat4 model_player = identity_mat4 ();	
-	model_player = translate (model_player, vec3(xxxx, 0, zzzz));
+	model_player = translate (model_player, vec3(xxxx, -0.5, zzzz));
 	mat4 play = model_player * plane;
 
 	glUniformMatrix4fv (matrix_location, 1, GL_FALSE, play.m);
@@ -501,7 +515,7 @@ void display(){
 	// tell GL to only draw onto a pixel if the shape is closer to the viewer
 	glEnable (GL_DEPTH_TEST); // enable depth-testing
 	glDepthFunc (GL_LESS); // depth-testing interprets a smaller value as "closer"
-	glClearColor (1.0f, 0.5f, 0.5f, 1.0f);
+	glClearColor (0.0f, 0.5f, 0.8f, 1.0f);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram (shaderProgramID);
 
@@ -521,11 +535,12 @@ void display(){
 	int matrix_location = glGetUniformLocation (shaderProgramID, "model");
 	int view_mat_location = glGetUniformLocation (shaderProgramID, "view");
 	int proj_mat_location = glGetUniformLocation (shaderProgramID, "proj");
-
+	int colour_location = glGetUniformLocation (shaderProgramID, "Kd");
+	int light_location = glGetUniformLocation (shaderProgramID, "light_position_world");
 
 	mat4 cam = look_at(vec3(camerax, cameray, cameraz), vec3 (xxxx,0,zzzz), vec3(0,1,0));
 
-	//cout << camerax << "," << cameray << "," << cameraz << endl;
+	
 
 	//plane
 		mat4 persp_proj_plane = perspective(45.0, (float)width/(float)height, 0.1, 1000.0);
@@ -536,12 +551,17 @@ void display(){
 		glUniformMatrix4fv (proj_mat_location, 1, GL_FALSE, persp_proj_plane.m);
 		glUniformMatrix4fv (view_mat_location, 1, GL_FALSE, cam.m);
 		glUniformMatrix4fv (matrix_location, 1, GL_FALSE, model_plane.m);
+		glUniform3fv (colour_location, 1, colourL.v);
+		glUniform3fv (light_location, 1, lightL.v);
 
 		glBindVertexArray(VAOs[3]);
 
 	//tongue & animations
 	if(runner < 3750){
 		cameray = 0.0f;
+
+		colourL = t_c;
+		glUniform3fv (colour_location, 1, colourL.v);
 
 		//tongue
 		mat4 model_tongue = identity_mat4 ();
@@ -564,6 +584,9 @@ void display(){
 			runner++;
 		}
 
+		colourL = l_c;
+		glUniform3fv (colour_location, 1, colourL.v);
+
 		//lolipop
 		mat4 model_lolipop = identity_mat4 ();	
 		model_lolipop = translate (model_lolipop, vec3(3.0f ,-1.0f ,0.0f)); 
@@ -575,26 +598,43 @@ void display(){
 		glDrawArrays (GL_TRIANGLES, 0, g_point_count[5]);
 		
 	}else if  (runner >= 3750 && runner < 4800){
-		
+
+		lightL = vec3 (0,100,0);
+		glUniform3fv (light_location, 1, lightL.v);
+
 		runner++;
 
-		if(cameray < 196.0f){
+		if(cameray < 120.0f){
 			cameray += 0.2;
 		}
 		if(cameraz < -175.0f){
 			cameraz += 0.2;
 		}
+		colourL =  pl_c;
+		glUniform3fv (colour_location, 1, colourL.v);
 		glDrawArrays (GL_TRIANGLES, 0, g_point_count[3]);
 		
 	}else{
 
+		lightL = vec3 (a,b,c);
+		glUniform3fv (light_location, 1, lightL.v);
+
+		cout << a << "," << b << "," << c << endl;
+
 		collision_detection();
 
-		cout << score << endl;
+		//cout << score << endl;
 
+		colourL =  pl_c;
+		glUniform3fv (colour_location, 1, colourL.v);
 		glDrawArrays (GL_TRIANGLES, 0, g_point_count[3]);
 
+		colourL =  p_c;
+		glUniform3fv (colour_location, 1, colourL.v);
 		draw_player(matrix_location, view_mat_location, proj_mat_location, model_plane);
+
+		vec3 colourL = l_c;
+		glUniform3fv (colour_location, 1, colourL.v);
 
 		//lolis
 		for(int i = 0; i < 15; i++){
@@ -603,6 +643,8 @@ void display(){
 			}
 		}
 
+		colourL =  s_c;
+		glUniform3fv (colour_location, 1, colourL.v);
 		//sweets
 		for(int j = 15; j < 23; j++){ 
 			if(sweet_uneaten[j] == true){
@@ -610,6 +652,8 @@ void display(){
 			}
 		}
 
+		colourL =  j_c;
+		glUniform3fv (colour_location, 1, colourL.v);
 		//jellies
 		for(int k = 23; k < 28; k++){
 			if(sweet_uneaten[k] == true){
@@ -617,22 +661,19 @@ void display(){
 			}
 		}
 
+		colourL =  a_c;
+		glUniform3fv (colour_location, 1, colourL.v);
 		//apples
-		for(int i = 0; i < 15; i++){
+		for(int i = 0; i < 12; i++){
 			if(fruit_uneaten[i] == true){
 				draw_apples(i, matrix_location, view_mat_location, proj_mat_location, model_plane);
 			}
 		}
 
-		//bananas
-		for(int j = 15; j < 23; j++){ 
-			if(fruit_uneaten[j] == true){
-				draw_bananas(j, matrix_location, view_mat_location, proj_mat_location, model_plane);
-			}
-		}
-
+		colourL =  pe_c;
+		glUniform3fv (colour_location, 1, colourL.v);
 		//pears
-		for(int k = 23; k < 28; k++){
+		for(int k = 12; k < 23; k++){
 			if(fruit_uneaten[k] == true){
 				draw_pears(k, matrix_location, view_mat_location, proj_mat_location, model_plane);
 			}
@@ -688,7 +729,7 @@ void keypress(unsigned char key, int x, int y) {
 	if(key == 27){
 		exit(0);
 	}
-	if(key == 'g'){
+	if(key == 32){
 		runner = 4000;
 	}
 
@@ -720,17 +761,17 @@ void keypress(unsigned char key, int x, int y) {
 				}
 				break;
 			case 'l' :
-				if(xxxx >= -113){
+				if(xxxx >= -110){
 					xxxx -= 2;
 				}
 				break;
 			case 'i' :
-				if(zzzz <= 122){
+				if(zzzz <= 118){
 					zzzz += 2; 
 				}
 				break;
 			case 'k' :
-				if(zzzz >= -122){
+				if(zzzz >= -118){
 					zzzz -= 2;
 				}
 				break;
