@@ -1,29 +1,28 @@
-﻿Build started 12/12/2016 3:34:30 PM.
+﻿Build started 12/13/2016 12:49:50 AM.
      1>Project "C:\Users\Aisling\documents\visual studio 2012\Projects\Project1\Project1\Project1.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I"C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\glfw-3.2.1\include" /I"C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\assimp\include" /I"C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\glew-1.10.0\include" /I"C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\freeglut\include" /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I"C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\glfw-3.2.1\include" /I"C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\Simple OpenGL Image Library\src" /I"C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\assimp\include" /I"C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\glew-1.10.0\include" /I"C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\freeglut\include" /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
          main.cpp
-     1>main.cpp(113): warning C4305: 'argument' : truncation from 'double' to 'float'
-     1>main.cpp(114): warning C4305: 'argument' : truncation from 'double' to 'float'
-     1>main.cpp(116): warning C4305: 'argument' : truncation from 'double' to 'float'
-     1>main.cpp(117): warning C4305: 'argument' : truncation from 'double' to 'float'
      1>main.cpp(118): warning C4305: 'argument' : truncation from 'double' to 'float'
      1>main.cpp(119): warning C4305: 'argument' : truncation from 'double' to 'float'
-     1>main.cpp(197): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+     1>main.cpp(121): warning C4305: 'argument' : truncation from 'double' to 'float'
+     1>main.cpp(122): warning C4305: 'argument' : truncation from 'double' to 'float'
+     1>main.cpp(123): warning C4305: 'argument' : truncation from 'double' to 'float'
+     1>main.cpp(124): warning C4305: 'argument' : truncation from 'double' to 'float'
+     1>main.cpp(200): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
                  C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\stdio.h(218) : see declaration of 'fopen'
-     1>main.cpp(376): warning C4244: 'argument' : conversion from 'time_t' to 'unsigned int', possible loss of data
-     1>main.cpp(418): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>main.cpp(526): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\include\stdio.h(357) : see declaration of 'sprintf'
-     1>main.cpp(528): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
-     1>main.cpp(529): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
-     1>main.cpp(546): warning C4305: 'argument' : truncation from 'double' to 'float'
-     1>main.cpp(608): warning C4305: '+=' : truncation from 'double' to 'float'
-     1>main.cpp(611): warning C4305: '+=' : truncation from 'double' to 'float'
+     1>main.cpp(387): warning C4244: 'argument' : conversion from 'time_t' to 'unsigned int', possible loss of data
+     1>main.cpp(485): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>main.cpp(605): warning C4305: 'argument' : truncation from 'double' to 'float'
+     1>main.cpp(626): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+     1>main.cpp(680): warning C4305: '+=' : truncation from 'double' to 'float'
+     1>main.cpp(683): warning C4305: '+=' : truncation from 'double' to 'float'
        Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Aisling\documents\visual studio 2012\Projects\Project1\Release\Project1.exe" /NOLOGO /LIBPATH:"C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\assimp\lib\Release" /LIBPATH:"C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\glew-1.10.0\lib\Release\Win32" /LIBPATH:"C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\freeglut\lib" freeglut.lib glew32.lib assimp.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Aisling\documents\visual studio 2012\Projects\Project1\Release\Project1.pdb" /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Aisling\documents\visual studio 2012\Projects\Project1\Release\Project1.lib" /MACHINE:X86 /SAFESEH Release\main.obj
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Aisling\documents\visual studio 2012\Projects\Project1\Release\Project1.exe" /NOLOGO /LIBPATH:"C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\Simple OpenGL Image Library\lib" /LIBPATH:"C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\assimp\lib\Release" /LIBPATH:"C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\glew-1.10.0\lib\Release\Win32" /LIBPATH:"C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\freeglut\lib" freeglut.lib glew32.lib assimp.lib SOIL.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Aisling\documents\visual studio 2012\Projects\Project1\Release\Project1.pdb" /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Aisling\documents\visual studio 2012\Projects\Project1\Release\Project1.lib" /MACHINE:X86 /SAFESEH Release\main.obj
          Release\maths_funcs.obj
          Release\text.obj
+     1>SOIL.lib(SOIL.obj) : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/OPT:ICF' specification
+     1>LINK : warning LNK4098: defaultlib 'MSVCRTD' conflicts with use of other libs; use /NODEFAULTLIB:library
          Generating code
          Finished generating code
          Project1.vcxproj -> C:\Users\Aisling\documents\visual studio 2012\Projects\Project1\Release\Project1.exe
@@ -31,4 +30,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:02.05
+Time Elapsed 00:00:01.70

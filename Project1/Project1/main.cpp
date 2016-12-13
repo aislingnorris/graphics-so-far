@@ -8,8 +8,12 @@
 #include "maths_funcs.h"
 #include "text.h"
 
+#include <string> 
 #include <stdlib.h>     
-#include <time.h>      
+#include <time.h>     
+#include <assert.h>
+#include <string.h>
+#include <math.h>
 
 
 //#include <GLFW/glfw3.h>
@@ -21,15 +25,9 @@
 #include <assimp/postprocess.h> // various extra operations
 #include <stdio.h>
 #include <math.h>
+#include "stb_image.h" // Sean Barrett's image loader
+#include "SOIL.h"
 #include <vector> // STL dynamic memory.
-
-//text
-const char* Timage = "C:/Users/Aisling/Documents/Visual Studio 2012/Projects/Project1/Project1/freemono.png";
-const char* Tmeta = "C:/Users/Aisling/Documents/Visual Studio 2012/Projects/Project1/Project1/freemono.meta";
-
-
-//text time id 
-int time_id = -1;
 
 
 /*----------------------------------------------------------------------------
@@ -80,6 +78,13 @@ float xxxx = 10.0f;
 float zzzz= 0.0f;
 
 int score = 0;
+int endy = 0;
+int timer = 0;
+
+// files to use for font. change path here
+const char* atlas_image = "C:/Users/Aisling/Documents/Visual Studio 2012/Projects/Project1/Project1/freemono.png";
+const char* atlas_meta = "C:/Users/Aisling/Documents/Visual Studio 2012/Projects/Project1/Project1/freemono.meta";
+int time_id;
 
 unsigned int mesh_vao = 0;
 int width = 1400;
@@ -106,7 +111,7 @@ float fruit_locations[30][2];
 bool fruit_uneaten[30];
 
 vec3 plane_location = vec3 (0.0f, 0.0f, 0.0f);
-vec3 tongue_location = vec3(8.0f, -1.0f, -270.0f);
+vec3 tongue_location = vec3(9.0f, -1.0f, -270.0f);
 
 
 vec3 b_c = vec3(1.0, 1.0, 0.0);
@@ -119,8 +124,6 @@ vec3 l_c = vec3(0.8, 0.3, 1.0);
 vec3 s_c = vec3(0.0, 0.2, 0.8);
 vec3 p_c = vec3(1.0, 1.0, 1.0);
 
-
-//max_bounds LBC(-70,0-70) RBC (70,0-70) LFC (-70,0,70) RFC (70,0,70)
 
 int runner = 0;
 int cut_scene = 0;
@@ -359,9 +362,17 @@ void collision_detection(){
 						if(score > 0){
 							//apples worth 5, pears worth 10
 							if(i >= 0 && i < 12){
+								if(score - 5 < 0){
+									score = 0;
+								}else{
 								score -= 5;
+								}
 							}else if (i >= 12 && i < 23){
+								if(score - 10 < 0){
+									score = 0;
+								}else{
 								score -= 10;
+								}
 							}
 						}
 				}
@@ -382,9 +393,65 @@ float random_poisition(){
 
 }
 
+void drawText(const char *text, int length, int x_pos, int y_pos){
+	//tutorial for this type of text from https://www.youtube.com/watch?v=elE__Nouv54
+
+	glMatrixMode(GL_PROJECTION);
+	double *matrix = new double[16];
+	glGetDoublev(GL_PROJECTION_MATRIX, matrix);
+	glLoadIdentity();
+
+	double aspect_ratio = (double) width / (double) height;
+	glOrtho(-10*aspect_ratio, 10*aspect_ratio, -10, 10, -1, 1);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glRasterPos2i(x_pos,y_pos);
+
+	for(int i = 0; i < length; i++){
+		glutBitmapCharacter(GLUT_BITMAP_9_BY_15, (int)text[i]);
+	}
+	glPopMatrix();
+	glMatrixMode(GL_POSITION);
+	glLoadMatrixd(matrix);
+	glMatrixMode(GL_MODELVIEW);
+}
+
+void texturing(){
+	//textures
+	GLuint tex;
+	glGenTextures(1, &tex);
+
+	glBindTexture(GL_TEXTURE_2D, tex);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+
+	float colour[] = { 1.0f, 0.0f, 0.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, colour);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	// Black/white checkerboard
+	float pixels[] = {
+		0.0f, 0.0f, 0.0f,   1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,   0.0f, 0.0f, 0.0f
+	};
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT, pixels);
+
+	int awidth, aheight;
+	unsigned char* image =
+    SOIL_load_image("C:/Users/Aisling/Documents/Visual Studio 2012/Projects/Project1/Project1/img.png", &awidth, &aheight, 0, SOIL_LOAD_RGB);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, awidth, aheight, 0, GL_RGB,
+              GL_UNSIGNED_BYTE, image);
+
+	SOIL_free_image_data(image);
+}
+
 void draw_player(int matrix_location, int view_mat_location, int proj_mat_location, mat4 plane) {
 
-	//bushes
 	mat4 model_player = identity_mat4 ();	
 	model_player = translate (model_player, vec3(xxxx, -0.5, zzzz));
 	mat4 play = model_player * plane;
@@ -518,18 +585,9 @@ void display(){
 	glClearColor (0.0f, 0.5f, 0.8f, 1.0f);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram (shaderProgramID);
+	//glViewport(0,0,width,height);
 
 
-	//text
-	double t = (double)glutGet(GLUT_ELAPSED_TIME) / 1000.0;
-	char tmp[256];
-	sprintf(tmp, "The time is: %f\n", t);
-	update_text(time_id, tmp);
-	float r = fabs(sinf(t));
-	float g = fabs(sinf(t + 1.57f));
-	change_text_colour(time_id, r, g, 0.0f, 1.0f);
-
-	//draw_texts ();
 
 	//Declare your uniform variables that will be used in your shader
 	int matrix_location = glGetUniformLocation (shaderProgramID, "model");
@@ -538,9 +596,10 @@ void display(){
 	int colour_location = glGetUniformLocation (shaderProgramID, "Kd");
 	int light_location = glGetUniformLocation (shaderProgramID, "light_position_world");
 
-	mat4 cam = look_at(vec3(camerax, cameray, cameraz), vec3 (xxxx,0,zzzz), vec3(0,1,0));
+	//texturing();
 
-	
+	//camera
+	mat4 cam = look_at(vec3(camerax, cameray, cameraz), vec3 (xxxx,0,zzzz), vec3(0,1,0));
 
 	//plane
 		mat4 persp_proj_plane = perspective(45.0, (float)width/(float)height, 0.1, 1000.0);
@@ -560,8 +619,20 @@ void display(){
 	if(runner < 3750){
 		cameray = 0.0f;
 
+		//text
+		std::string text;
+		text = "Only eat the sweets! Lolis worth 5, jelly worth 10, wrapped sweets worth 15! Avoid the fruit, apples are -5, and pears -10!";
+		glColor3f(0,1,0);
+		drawText(text.data(), text.size(), -12.5, 9);
+
+		text = "You will have one minute to get the highest score possible";
+		glColor3f(0,1,0);
+		drawText(text.data(), text.size(), -8, 7);
+
+
 		colourL = t_c;
 		glUniform3fv (colour_location, 1, colourL.v);
+
 
 		//tongue
 		mat4 model_tongue = identity_mat4 ();
@@ -570,6 +641,7 @@ void display(){
 
 		glUniformMatrix4fv (matrix_location, 1, GL_FALSE, tong.m);
 		glBindVertexArray(VAOs[0]);
+
 
 		if((runner < 250) || (runner >=750 && runner < 1000) || (runner >= 1500 && runner < 1750)|| (runner >= 2250 && runner < 2500)|| (runner >= 3000 && runner < 3250)){
 			glDrawArrays (GL_TRIANGLES, 0, g_point_count[0]);
@@ -616,67 +688,141 @@ void display(){
 		
 	}else{
 
-		lightL = vec3 (a,b,c);
-		glUniform3fv (light_location, 1, lightL.v);
+		//text
+		timer++;
 
-		cout << a << "," << b << "," << c << endl;
+		if((timer / 300) < 30){
+			//text
+			std::string text;
+			text = "Your Score is " + std::to_string(score);
+			glColor3f(1.0f, 1.0f, 1.0f);
+			drawText(text.data(), text.size(), -14, 9);
 
-		collision_detection();
+			text = "Time is " + std::to_string(timer / 300);
+			glColor3f(0,1,0);
+			drawText(text.data(), text.size(), -5, 9);
 
-		//cout << score << endl;
+			lightL = vec3 (a,b,c);
+			glUniform3fv (light_location, 1, lightL.v);
 
-		colourL =  pl_c;
-		glUniform3fv (colour_location, 1, colourL.v);
-		glDrawArrays (GL_TRIANGLES, 0, g_point_count[3]);
+			collision_detection();
 
-		colourL =  p_c;
-		glUniform3fv (colour_location, 1, colourL.v);
-		draw_player(matrix_location, view_mat_location, proj_mat_location, model_plane);
+			cout << score << endl;
 
-		vec3 colourL = l_c;
-		glUniform3fv (colour_location, 1, colourL.v);
+			colourL =  pl_c;
+			glUniform3fv (colour_location, 1, colourL.v);
+			glDrawArrays (GL_TRIANGLES, 0, g_point_count[3]);
 
-		//lolis
-		for(int i = 0; i < 15; i++){
-			if(sweet_uneaten[i] == true){
-				draw_lolipops(i, matrix_location, view_mat_location, proj_mat_location, model_plane);
+			colourL =  p_c;
+			glUniform3fv (colour_location, 1, colourL.v);
+			draw_player(matrix_location, view_mat_location, proj_mat_location, model_plane);
+
+			vec3 colourL = l_c;
+			glUniform3fv (colour_location, 1, colourL.v);
+
+			//lolis
+			for(int i = 0; i < 15; i++){
+				if(sweet_uneaten[i] == true){
+					draw_lolipops(i, matrix_location, view_mat_location, proj_mat_location, model_plane);
+				}
 			}
+
+			colourL =  s_c;
+			glUniform3fv (colour_location, 1, colourL.v);
+			//sweets
+			for(int j = 15; j < 23; j++){ 
+				if(sweet_uneaten[j] == true){
+					draw_sweets(j, matrix_location, view_mat_location, proj_mat_location, model_plane);
+				}
+			}
+
+			colourL =  j_c;
+			glUniform3fv (colour_location, 1, colourL.v);
+			//jellies
+			for(int k = 23; k < 28; k++){
+				if(sweet_uneaten[k] == true){
+					draw_jellies(k, matrix_location, view_mat_location, proj_mat_location, model_plane);
+				}
+			}
+
+			colourL =  a_c;
+			glUniform3fv (colour_location, 1, colourL.v);
+			//apples
+			for(int i = 0; i < 12; i++){
+				if(fruit_uneaten[i] == true){
+					draw_apples(i, matrix_location, view_mat_location, proj_mat_location, model_plane);
+				}
+			}
+
+			colourL =  pe_c;
+			glUniform3fv (colour_location, 1, colourL.v);
+			//pears
+			for(int k = 12; k < 23; k++){
+				if(fruit_uneaten[k] == true){
+					draw_pears(k, matrix_location, view_mat_location, proj_mat_location, model_plane);
+				}
+			}
+		} else {
+
+			runner = 8000;
+			camerax = 11;
+			cameray = 0;
+			cameraz = -288.0f;
+
+			lightL = vec3 (0.0, 10.0, -288.0);
+			glUniform3fv (light_location, 1, lightL.v);
+
+			std::string text;
+			if(score == 210){
+				text = "You reached the max score of " + std::to_string(score) + " well done!";
+			}else if(score > 100){
+				text = "You scored " + std::to_string(score) + " good job!";
+			}else{
+				text = "You did not do well. Your score was " + std::to_string(score);
+			}
+			glColor3f(1.0f, 1.0f, 1.0f);
+			drawText(text.data(), text.size(), -7, 9);
+
+		colourL = t_c;
+		glUniform3fv (colour_location, 1, colourL.v);
+
+
+		//tongue
+		mat4 model_tongue = identity_mat4 ();
+		model_tongue = translate (model_tongue, tongue_location);
+		mat4 tong = model_tongue;
+
+		glUniformMatrix4fv (matrix_location, 1, GL_FALSE, tong.m);
+		glBindVertexArray(VAOs[0]);
+
+
+		if(endy < 250){
+			glDrawArrays (GL_TRIANGLES, 0, g_point_count[0]);
+			endy++;
+		} else if(endy >= 250 && endy < 500){
+			draw_half_lick(matrix_location, view_mat_location, proj_mat_location, tong);
+			endy++;
+		}
+		else if (endy >= 500 && endy < 750){
+			draw_full_lick(matrix_location, view_mat_location, proj_mat_location, tong);
+			endy++;
+		} else {
+			endy = 0;
 		}
 
-		colourL =  s_c;
+		colourL = l_c;
 		glUniform3fv (colour_location, 1, colourL.v);
-		//sweets
-		for(int j = 15; j < 23; j++){ 
-			if(sweet_uneaten[j] == true){
-				draw_sweets(j, matrix_location, view_mat_location, proj_mat_location, model_plane);
-			}
-		}
 
-		colourL =  j_c;
-		glUniform3fv (colour_location, 1, colourL.v);
-		//jellies
-		for(int k = 23; k < 28; k++){
-			if(sweet_uneaten[k] == true){
-				draw_jellies(k, matrix_location, view_mat_location, proj_mat_location, model_plane);
-			}
-		}
+		//lolipop
+		mat4 model_lolipop = identity_mat4 ();	
+		model_lolipop = translate (model_lolipop, vec3(3.0f ,-1.0f ,0.0f)); 
+		//model_lolipop = scale(model_lolipop, vec3 (1.5f,1.5f,1.5f));
+		mat4 loli = model_lolipop * tong;
 
-		colourL =  a_c;
-		glUniform3fv (colour_location, 1, colourL.v);
-		//apples
-		for(int i = 0; i < 12; i++){
-			if(fruit_uneaten[i] == true){
-				draw_apples(i, matrix_location, view_mat_location, proj_mat_location, model_plane);
-			}
-		}
+		glUniformMatrix4fv (matrix_location, 1, GL_FALSE, loli.m);
+		glBindVertexArray(VAOs[5]);
+		glDrawArrays (GL_TRIANGLES, 0, g_point_count[5]);
 
-		colourL =  pe_c;
-		glUniform3fv (colour_location, 1, colourL.v);
-		//pears
-		for(int k = 12; k < 23; k++){
-			if(fruit_uneaten[k] == true){
-				draw_pears(k, matrix_location, view_mat_location, proj_mat_location, model_plane);
-			}
 		}
 	}
 
@@ -722,6 +868,15 @@ void init()
 	generateObjectBufferMesh(BANANA_MESH, 9);
 	generateObjectBufferMesh(PEAR_MESH, 10);
 
+	printf ("adding text...\n");
+	init_text_rendering (atlas_image, atlas_meta, width, height);
+	// x and y are -1 to 1
+	// size_px is the maximum glyph size in pixels (try 100.0f)
+	// r,g,b,a are red,blue,green,opacity values between 0.0 and 1.0
+	// if you want to change the text later you will use the returned integer as a parameter
+	//x, y, size_px, r, g, b, a
+	int hello_id = add_text ("hello",-0.9f, 0.5f, 35.0f, 0.5f, 0.5f, 1.0f, 1.0f);
+
 }
 
 void keypress(unsigned char key, int x, int y) {
@@ -733,7 +888,7 @@ void keypress(unsigned char key, int x, int y) {
 		runner = 4000;
 	}
 
-	if(runner >= 4800){
+	if(runner != 8000 && runner >= 4800){
 		switch (key){
 		//camera controls
 			case 'a' :
@@ -786,21 +941,56 @@ int main(int argc, char** argv){
 	glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
     glutInitWindowSize(width, height);
-    glutCreateWindow("EAT DA SWEEEEEEEEETS");
+    glutCreateWindow("Sweet Tooth");
+
 
 	if(first_go){
 		first_go = false;
 		 
-		for(int index = 0; index < 28; index++){
+		for(int i = 0; i < 28; i++){
 
-			sweet_locations[index][0] = random_poisition();
-			sweet_locations[index][1] = random_poisition();
+			sweet_locations[i][0] = random_poisition();
+			sweet_locations[i][1] = random_poisition();
 
-			fruit_locations[index][0] = random_poisition();
-			fruit_locations[index][1] = random_poisition();
+			fruit_locations[i][0] = random_poisition();
+			fruit_locations[i][1] = random_poisition();
 
-			sweet_uneaten[index] = true;
-			fruit_uneaten[index] = true;
+			sweet_uneaten[i] = true;
+			fruit_uneaten[i] = true;
+
+			if(xxxx >= (sweet_locations[i][0] - 10) && xxxx <= (sweet_locations[i][0] + 10)){
+				sweet_locations[i][0] += 5;
+			}
+			if(zzzz >= (sweet_locations[i][1] - 10) && zzzz <= (sweet_locations[i][1] + 10)){
+				sweet_locations[i][1] += 5;
+			}
+
+			if(xxxx >= (fruit_locations[i][0] - 10) && xxxx <= (fruit_locations[i][0] + 10)){
+				fruit_locations[i][0] += 5;
+			}
+			if(zzzz >= (fruit_locations[i][1] - 10) && zzzz <= (fruit_locations[i][1] + 10)){
+				fruit_locations[i][1] += 5;
+			}
+
+			if(i > 0){
+				for(int j = 0; j < i; j++){
+					if(sweet_locations[i][0] >= (sweet_locations[j][0] - 5) && sweet_locations[i][0] <= (sweet_locations[j][0] + 5)){
+					sweet_locations[i][0] += 5;
+					}
+					if (sweet_locations[i][1] >= (sweet_locations[j][1] - 5) && sweet_locations[i][1] <= (sweet_locations[j][1] + 5)){
+						sweet_locations[i][1] += 5;
+					}
+
+					if(fruit_locations[i][0] >= (fruit_locations[j][0] - 5) && fruit_locations[i][0] <= (fruit_locations[j][0] + 5)){
+					fruit_locations[i][0] += 5;
+					}
+					if (fruit_locations[i][1] >= (fruit_locations[j][1] - 5) && fruit_locations[i][1] <= (fruit_locations[j][1] + 5)){
+						fruit_locations[i][1] += 5;
+					}
+				}
+			}
+
+		
 		}
 	}
 
@@ -818,21 +1008,7 @@ int main(int argc, char** argv){
       return 1;
     }
 
-	// initialise font, load from files
-	if (!init_text_rendering(Timage, Tmeta, width, height)) {
-		fprintf(stderr, "ERROR init text rendering\n");
-		return 1;
-	}
-	printf ("adding text...\n");
-	int hello_id = add_text (
-		"Hello\nis it me you're looking for?",
-		-0.9f, 0.5f, 35.0f, 0.5f, 0.5f, 1.0f, 1.0f);
-	
-	//*x,y,size,r,g,b,a
-	time_id = add_text (
-		"The time is:",
-		-1.0f, 1.0f, 40.0f, 1.0f, 0.0f, 0.0f, 1.0f);
-	move_text (time_id, -1.0f, 1.0f);
+
 
 	// Set up your objects and shaders
 	init();

@@ -12,8 +12,9 @@
 //
 
 #include "text.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h" // Sean Barrett's image loader
+//#define STB_IMAGE_IMPLEMENTATION
+//#include "stb_image.h" // Sean Barrett's image loader
+#include "stb_image_aug.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

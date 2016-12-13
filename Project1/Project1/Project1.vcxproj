@@ -47,7 +47,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\assimp\lib\Debug;C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\glew-1.10.0\lib\Release\Win32;C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\freeglut\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\Simple OpenGL Image Library\projects\VC8\Debug;C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\assimp\lib\Debug;C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\glew-1.10.0\lib\Release\Win32;C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\freeglut\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>freeglut.lib;glew32.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -57,14 +57,14 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\glfw-3.2.1\include;C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\assimp\include;C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\glew-1.10.0\include;C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\freeglut\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\glfw-3.2.1\include;C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\Simple OpenGL Image Library\src;C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\assimp\include;C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\glew-1.10.0\include;C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\freeglut\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\assimp\lib\Release;C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\glew-1.10.0\lib\Release\Win32;C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\freeglut\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>freeglut.lib;glew32.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\Simple OpenGL Image Library\lib;C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\assimp\lib\Release;C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\glew-1.10.0\lib\Release\Win32;C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\freeglut\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>freeglut.lib;glew32.lib;assimp.lib;SOIL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
