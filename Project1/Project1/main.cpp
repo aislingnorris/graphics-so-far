@@ -118,7 +118,7 @@ vec3 b_c = vec3(1.0, 1.0, 0.0);
 vec3 pe_c = vec3(0.2, 1.0, 0.2);
 vec3 j_c = vec3(0.5, 0.0, 0.8);
 vec3 t_c = vec3(1.0, 0.5, 0.5);
-vec3 pl_c = vec3(0.1, 0.4, 0.1);
+vec3 pl_c = vec3(1, 1, 1);
 vec3 a_c = vec3(0.8, 0.2, 0.1);
 vec3 l_c = vec3(0.8, 0.3, 1.0);
 vec3 s_c = vec3(0.0, 0.2, 0.8);
@@ -131,7 +131,7 @@ int cut_scene = 0;
 GLuint loc1, loc2, loc3;
 GLfloat rotate_y = 0.0f;
 
-
+GLuint tex[2];
 
 
 #pragma region MESH LOADING
@@ -300,7 +300,7 @@ void generateObjectBufferMesh(char* file_path, int model_number) {
 	unsigned int vp_vbo = 0;
 	loc1 = glGetAttribLocation(shaderProgramID, "vertex_position");
 	loc2 = glGetAttribLocation(shaderProgramID, "vertex_normal");
-	loc3 = glGetAttribLocation(shaderProgramID, "vertex_texture");
+	loc3 = glGetAttribLocation(shaderProgramID, "vertex_textures");
 
 	glGenBuffers (1, &vp_vbo);
 	glBindBuffer (GL_ARRAY_BUFFER, vp_vbo);
@@ -311,10 +311,10 @@ void generateObjectBufferMesh(char* file_path, int model_number) {
 	glBufferData (GL_ARRAY_BUFFER, g_point_count[model_number] * 3 * sizeof (float), &g_vn[model_number][0], GL_STATIC_DRAW);
 
 //	This is for texture coordinates which you don't currently need, so I have commented it out
-//	unsigned int vt_vbo = 0;
-//	glGenBuffers (1, &vt_vbo);
-//	glBindBuffer (GL_ARRAY_BUFFER, vt_vbo);
-//	glBufferData (GL_ARRAY_BUFFER, g_point_count * 2 * sizeof (float), &g_vt[0], GL_STATIC_DRAW);
+	unsigned int vt_vbo = 0;
+	glGenBuffers (1, &vt_vbo);
+	glBindBuffer (GL_ARRAY_BUFFER, vt_vbo);
+	glBufferData (GL_ARRAY_BUFFER, g_point_count[model_number] * 2 * sizeof (float), &g_vt[model_number][0], GL_STATIC_DRAW);
 	
 	glGenVertexArrays(1, &VAOs[model_number]);
 
@@ -328,12 +328,11 @@ void generateObjectBufferMesh(char* file_path, int model_number) {
 	glVertexAttribPointer (loc2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
 //	This is for texture coordinates which you don't currently need, so I have commented it out
-//	glEnableVertexAttribArray (loc3);
-//	glBindBuffer (GL_ARRAY_BUFFER, vt_vbo);
-//	glVertexAttribPointer (loc3, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+	glEnableVertexAttribArray (loc3);
+	glBindBuffer (GL_ARRAY_BUFFER, vt_vbo);
+	glVertexAttribPointer (loc3, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 	
 }
-
 
 #pragma endregion VBO_FUNCTIONS
 
@@ -401,6 +400,8 @@ void drawText(const char *text, int length, int x_pos, int y_pos){
 	glGetDoublev(GL_PROJECTION_MATRIX, matrix);
 	glLoadIdentity();
 
+	// glColor3f(1.0f, 0.0f, 0.5f);
+
 	double aspect_ratio = (double) width / (double) height;
 	glOrtho(-10*aspect_ratio, 10*aspect_ratio, -10, 10, -1, 1);
 	glMatrixMode(GL_MODELVIEW);
@@ -408,7 +409,7 @@ void drawText(const char *text, int length, int x_pos, int y_pos){
 	glRasterPos2i(x_pos,y_pos);
 
 	for(int i = 0; i < length; i++){
-		glutBitmapCharacter(GLUT_BITMAP_9_BY_15, (int)text[i]);
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, (int)text[i]);
 	}
 	glPopMatrix();
 	glMatrixMode(GL_POSITION);
@@ -418,36 +419,45 @@ void drawText(const char *text, int length, int x_pos, int y_pos){
 
 void texturing(){
 	//textures
-	GLuint tex;
-	glGenTextures(1, &tex);
+	glGenTextures(2, tex);
+	glActiveTexture(GL_TEXTURE);
 
-	glBindTexture(GL_TEXTURE_2D, tex);
+	glBindTexture(GL_TEXTURE_2D, tex[0]);
+
+	int awidth, aheight;
+	unsigned char* image = SOIL_load_image("C:/Users/Aisling/Documents/Visual Studio 2012/Projects/Project1/Project1/grass.png", &awidth, &aheight, 0, SOIL_LOAD_RGB);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, awidth, aheight, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 
-	float colour[] = { 1.0f, 0.0f, 0.0f, 1.0f };
-	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, colour);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	SOIL_free_image_data(image);
+
+	glUniform1i(glGetUniformLocation(shaderProgramID, "tex"), 0);
+
+
+	glBindTexture(GL_TEXTURE_2D, tex[1]);
+
+	int bwidth, bheight;
+	unsigned char* image2 = SOIL_load_image("C:/Users/Aisling/Documents/Visual Studio 2012/Projects/Project1/Project1/white.png", &bwidth, &bheight, 0, SOIL_LOAD_RGB);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, bwidth, bheight, 0, GL_RGB, GL_UNSIGNED_BYTE, image2);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
+	
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	// Black/white checkerboard
-	float pixels[] = {
-		0.0f, 0.0f, 0.0f,   1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,   0.0f, 0.0f, 0.0f
-	};
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT, pixels);
+	SOIL_free_image_data(image2);
 
-	int awidth, aheight;
-	unsigned char* image =
-    SOIL_load_image("C:/Users/Aisling/Documents/Visual Studio 2012/Projects/Project1/Project1/img.png", &awidth, &aheight, 0, SOIL_LOAD_RGB);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, awidth, aheight, 0, GL_RGB,
-              GL_UNSIGNED_BYTE, image);
-
-	SOIL_free_image_data(image);
+	glUniform1i(glGetUniformLocation(shaderProgramID, "tex"), 1);
 }
 
 void draw_player(int matrix_location, int view_mat_location, int proj_mat_location, mat4 plane) {
@@ -587,7 +597,7 @@ void display(){
 	glUseProgram (shaderProgramID);
 	//glViewport(0,0,width,height);
 
-
+	glUniform1i(glGetUniformLocation(shaderProgramID, "tex"), 0);
 
 	//Declare your uniform variables that will be used in your shader
 	int matrix_location = glGetUniformLocation (shaderProgramID, "model");
@@ -612,6 +622,10 @@ void display(){
 		glUniformMatrix4fv (matrix_location, 1, GL_FALSE, model_plane.m);
 		glUniform3fv (colour_location, 1, colourL.v);
 		glUniform3fv (light_location, 1, lightL.v);
+		
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D,tex[1]);
+		glActiveTexture(GL_TEXTURE);
 
 		glBindVertexArray(VAOs[3]);
 
@@ -622,13 +636,12 @@ void display(){
 		//text
 		std::string text;
 		text = "Only eat the sweets! Lolis worth 5, jelly worth 10, wrapped sweets worth 15! Avoid the fruit, apples are -5, and pears -10!";
-		glColor3f(0,1,0);
+		//glColor4f(1,0,1,1);
 		drawText(text.data(), text.size(), -12.5, 9);
 
 		text = "You will have one minute to get the highest score possible";
-		glColor3f(0,1,0);
+		//glColor3f(1,1,1);
 		drawText(text.data(), text.size(), -8, 7);
-
 
 		colourL = t_c;
 		glUniform3fv (colour_location, 1, colourL.v);
@@ -684,6 +697,11 @@ void display(){
 		}
 		colourL =  pl_c;
 		glUniform3fv (colour_location, 1, colourL.v);
+
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D,tex[0]);
+		glActiveTexture(GL_TEXTURE);
+
 		glDrawArrays (GL_TRIANGLES, 0, g_point_count[3]);
 		
 	}else{
@@ -691,7 +709,7 @@ void display(){
 		//text
 		timer++;
 
-		if((timer / 300) < 30){
+		if((timer / 300) < 60){
 			//text
 			std::string text;
 			text = "Your Score is " + std::to_string(score);
@@ -707,11 +725,18 @@ void display(){
 
 			collision_detection();
 
-			cout << score << endl;
+			//cout << score << endl;
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D,tex[0]);
+			glActiveTexture(GL_TEXTURE);
 
 			colourL =  pl_c;
 			glUniform3fv (colour_location, 1, colourL.v);
 			glDrawArrays (GL_TRIANGLES, 0, g_point_count[3]);
+
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D,tex[1]);
+			glActiveTexture(GL_TEXTURE);
 
 			colourL =  p_c;
 			glUniform3fv (colour_location, 1, colourL.v);
@@ -765,7 +790,11 @@ void display(){
 		} else {
 
 			runner = 8000;
-			camerax = 11;
+
+			xxxx = 0.0f;
+			zzzz = 0.0f;
+
+			camerax = 10;
 			cameray = 0;
 			cameraz = -288.0f;
 
@@ -774,9 +803,9 @@ void display(){
 
 			std::string text;
 			if(score == 210){
-				text = "You reached the max score of " + std::to_string(score) + " well done!";
+				text = "You reached the max score of " + std::to_string(score) + " you win!";
 			}else if(score > 100){
-				text = "You scored " + std::to_string(score) + " good job!";
+				text = "You scored " + std::to_string(score) + " good job! Why not try again?";
 			}else{
 				text = "You did not do well. Your score was " + std::to_string(score);
 			}
@@ -852,6 +881,9 @@ void init()
 	GLuint shaderProgramID = CompileShaders();
 	// load mesh into a vertex buffer array
 
+	texturing();
+
+	PlaySound("C:/Users/Aisling/Documents/Visual Studio 2012/Projects/Project1/Project1/sugar.wav", NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
 
     generateObjectBufferMesh(TONGUE_MESH, 0);
 	generateObjectBufferMesh(HALF_LICK_MESH, 1);
@@ -884,7 +916,7 @@ void keypress(unsigned char key, int x, int y) {
 	if(key == 27){
 		exit(0);
 	}
-	if(key == 32){
+	if(key == 32 && runner != 8000){
 		runner = 4000;
 	}
 

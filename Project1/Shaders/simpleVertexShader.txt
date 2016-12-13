@@ -3,6 +3,8 @@
 in vec3 vertex_position;
 in vec3 vertex_normal;
 
+in vec2 vertex_textures;
+
 uniform mat4 proj, view, model;
 vec3 position_eye, normal_eye;
 
@@ -24,8 +26,11 @@ vec3 Ka = vec3 (1.0, 1.0, 1.0); // fully reflect ambient light
 float specular_exponent = 100.0; // specular 'power'
 out vec4 fragment_colour; // final colour of surface
 
+out vec2 texture_coords;
 
 void main () {
+
+	texture_coords = vertex_textures;
 
 	mat4 ModelViewMatrix = view * model;
 	mat3 NormalMatrix =  mat3(ModelViewMatrix);
