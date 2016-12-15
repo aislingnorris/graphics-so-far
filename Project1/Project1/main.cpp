@@ -639,7 +639,7 @@ void display(){
 		//glColor4f(1,0,1,1);
 		drawText(text.data(), text.size(), -12.5, 9);
 
-		text = "You will have one minute to get the highest score possible";
+		text = "You will have one minute to get a score of at least 150 points to win!";
 		//glColor3f(1,1,1);
 		drawText(text.data(), text.size(), -8, 7);
 
@@ -803,11 +803,11 @@ void display(){
 
 			std::string text;
 			if(score == 210){
-				text = "You reached the max score of " + std::to_string(score) + " you win!";
-			}else if(score > 100){
-				text = "You scored " + std::to_string(score) + " good job! Why not try again?";
+				text = "You reached the max score of " + std::to_string(score) + " you won!";
+			}else if(score > 150){
+				text = "You scored " + std::to_string(score) + " good job you won!";
 			}else{
-				text = "You did not do well. Your score was " + std::to_string(score);
+				text = "You lost. Your score was " + std::to_string(score);
 			}
 			glColor3f(1.0f, 1.0f, 1.0f);
 			drawText(text.data(), text.size(), -7, 9);
