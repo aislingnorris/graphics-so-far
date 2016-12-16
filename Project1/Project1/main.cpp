@@ -716,7 +716,7 @@ void display(){
 			glColor3f(1.0f, 1.0f, 1.0f);
 			drawText(text.data(), text.size(), -14, 9);
 
-			text = "Time is " + std::to_string(timer / 300);
+			text = "Time is " + std::to_string(60 -(timer / 300));
 			glColor3f(0,1,0);
 			drawText(text.data(), text.size(), -5, 9);
 
