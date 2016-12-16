@@ -1,4 +1,4 @@
-﻿Build started 12/15/2016 5:27:52 PM.
+﻿Build started 12/16/2016 12:31:23 PM.
      1>Project "C:\Users\Aisling\documents\visual studio 2012\Projects\Project1\Project1\Project1.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I"C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\glfw-3.2.1\include" /I"C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\Simple OpenGL Image Library\src" /I"C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\assimp\include" /I"C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\glew-1.10.0\include" /I"C:\Users\Aisling\Documents\Visual Studio 2012\Projects\Project1\Project1\freeglut\include" /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
@@ -29,4 +29,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:02.02
+Time Elapsed 00:00:02.70
